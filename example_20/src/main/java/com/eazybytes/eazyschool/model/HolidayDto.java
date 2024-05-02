@@ -1,5 +1,8 @@
 package com.eazybytes.eazyschool.model;
 
+import lombok.Data;
+
+@Data
 public class HolidayDto {
     private final String day;
     private final String reason;
@@ -10,21 +13,4 @@ public class HolidayDto {
         FEDERAL
     }
 
-    public HolidayDto(String day,String reason,Type type){
-        this.day = day;
-        this.reason = reason;
-        this.type = type;
-    }
-
-    public String getDay() {
-        return day;
-    }
-
-    public String getReason() {
-        return reason;
-    }
-
-    public Type getType() {
-        return type;
-    }
 }
