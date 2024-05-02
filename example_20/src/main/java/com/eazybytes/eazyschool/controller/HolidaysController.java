@@ -4,6 +4,7 @@ import com.eazybytes.eazyschool.model.HolidayDto;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,7 +14,9 @@ import java.util.stream.Collectors;
 @Controller
 public class HolidaysController {
     @RequestMapping("/holidays")
-    public String displayHolidays(Model model){
+    public String displayHolidays(@RequestParam (required = false) boolean festival,@RequestParam (required = false) boolean federal, Model model){
+        model.addAttribute("festival",festival);
+        model.addAttribute("federal",federal);
         List<HolidayDto> holidays = Arrays.asList(
                 new HolidayDto("Jan 1","New Year", HolidayDto.Type.FEDERAL),
                 new HolidayDto("Oct 31","Halloween", HolidayDto.Type.FESTIVAL),
