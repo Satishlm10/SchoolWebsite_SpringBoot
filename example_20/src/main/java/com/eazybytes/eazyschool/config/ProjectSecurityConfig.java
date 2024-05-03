@@ -4,9 +4,13 @@ package com.eazybytes.eazyschool.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -72,21 +76,26 @@ public class ProjectSecurityConfig {
      */
     @Bean
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+
         http.authorizeHttpRequests((requests) ->
                 requests
+                        .requestMatchers("/dashboard").authenticated()
                         .requestMatchers("/home").permitAll()
+                        .requestMatchers("/").permitAll()
+                        .requestMatchers("").permitAll()
                         .requestMatchers("/courses").permitAll()
                         .requestMatchers("/contact").permitAll()
-                        .requestMatchers("/holidays").permitAll()
+                        .requestMatchers("/holidays/**").permitAll()
                         .requestMatchers("/about").permitAll()
                         .requestMatchers("/saveMsg").permitAll()
+                        .requestMatchers("/login").permitAll()
                         /*
                          since the html file are made public by permitAll() method
                            the files(css,js,image,ets) under static package won't be accessible hence we need to make static.assets package
                            accessible too
                          */
                         .requestMatchers("/assets/**").permitAll()
-                        .anyRequest().permitAll()
+                        .anyRequest().authenticated()
 
                 /*
                         //.anyRequest().authenticated()
@@ -103,8 +112,41 @@ public class ProjectSecurityConfig {
                  */
 
         );
-        http.formLogin(Customizer.withDefaults());
+        http.formLogin(loginConfigurer -> loginConfigurer
+                .loginPage("/login")
+                .defaultSuccessUrl("/dashboard", false)
+                .failureUrl("/login?error=true")
+
+        );
+
+        http.logout(logoutConfigurer -> logoutConfigurer
+                .logoutSuccessUrl("/login?logout=true")
+                .invalidateHttpSession(true)
+
+        );
+
         http.httpBasic(Customizer.withDefaults());
         return http.build();
+    }
+
+
+    /* using InMemoryUserDetailsManager we can create multiple user who can access our website but
+    this approach is only recommended for production because we will use data to store multiple
+    users for live website and perform role base authentication based on the roles of users save in database
+     */
+    @Bean
+    public InMemoryUserDetailsManager userDetailsService() {
+
+        UserDetails user = User.withDefaultPasswordEncoder()
+                .username("user")
+                .password("12345")
+                .roles("USER")
+                .build();
+        UserDetails admin = User.withDefaultPasswordEncoder()
+                .username("admin")
+                .password("54321")
+                .roles("USER", "ADMIN")
+                .build();
+        return new InMemoryUserDetailsManager(user, admin);
     }
 }
