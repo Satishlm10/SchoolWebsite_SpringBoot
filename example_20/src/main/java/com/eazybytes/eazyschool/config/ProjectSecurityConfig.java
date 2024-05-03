@@ -30,10 +30,29 @@ public class ProjectSecurityConfig {
     /*
     for production environment we bypass the default security using permitAll() method
      */
+
+    /*
+
     @Bean
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests((requests) -> {
             ((AuthorizeHttpRequestsConfigurer.AuthorizedUrl)requests.anyRequest()).permitAll();
+        });
+        http.formLogin(Customizer.withDefaults());
+        http.httpBasic(Customizer.withDefaults());
+        return (SecurityFilterChain)http.build();
+    }
+     */
+
+    /*
+    as per requirement resources may require to be not accessible sometimes
+    we use denyAll() method for such cases
+    authentication login page is provided by when user tries to login a access denied message is displayed
+     */
+    @Bean
+    SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+        http.authorizeHttpRequests((requests) -> {
+            ((AuthorizeHttpRequestsConfigurer.AuthorizedUrl)requests.anyRequest()).denyAll();
         });
         http.formLogin(Customizer.withDefaults());
         http.httpBasic(Customizer.withDefaults());
