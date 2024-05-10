@@ -1,8 +1,13 @@
 package com.eazybytes.eazyschool.controller;
 
+import com.eazybytes.eazyschool.entity.Holiday;
 import com.eazybytes.eazyschool.model.HolidayDto;
+import com.eazybytes.eazyschool.repository.HolidayRepository;
+import com.eazybytes.eazyschool.repository.HolidayRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -39,7 +44,7 @@ public class HolidaysController {
     }
 
      */
-
+/*
     @RequestMapping("/holidays/{display}")
     public String displayHolidays(@PathVariable(required = false) String display, Model model){
 
@@ -69,6 +74,30 @@ public class HolidaysController {
         HolidayDto.Type[] types = HolidayDto.Type.values();
         for(HolidayDto.Type type : types){
             model.addAttribute(type.toString(),(holidays.stream().filter(holidayDto -> holidayDto.getType().equals(type))).collect(Collectors.toList()));
+        }
+        return "holidays.html";
+    }
+
+ */
+
+    @Autowired
+    private HolidayRepository holidaysRepository;
+
+    @GetMapping("/holidays/{display}")
+    public String displayHolidays(@PathVariable String display,Model model) {
+        if(null != display && display.equals("all")){
+            model.addAttribute("festival",true);
+            model.addAttribute("federal",true);
+        }else if(null != display && display.equals("federal")){
+            model.addAttribute("federal",true);
+        }else if(null != display && display.equals("festival")){
+            model.addAttribute("festival",true);
+        }
+        List<Holiday> holidays = holidaysRepository.findAllHolidays();
+        Holiday.Type[] types = Holiday.Type.values();
+        for (Holiday.Type type : types) {
+            model.addAttribute(type.toString(),
+                    (holidays.stream().filter(holiday -> holiday.getType().equals(type)).collect(Collectors.toList())));
         }
         return "holidays.html";
     }
